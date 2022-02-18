@@ -2,9 +2,11 @@ package pro.sky.java.course2.lesson2_14;
 
 import java.util.Arrays;
 
+import static java.util.Arrays.copyOf;
+
 public class IntListImpl implements IntList {
     private Integer[] array;
-    private int position = 0;
+    private static int position = 0;
     private static final int INIT_NUM = 8;
 
 
@@ -15,7 +17,7 @@ public class IntListImpl implements IntList {
     @Override
     public Integer add(Integer item) {
         checkNotNull(item);
-        checkNum();
+        checkArray();
         array[position++] = item;
         return item;
     }
@@ -25,6 +27,7 @@ public class IntListImpl implements IntList {
         checkNotNull(item);
         checkIndex(index);
         checkNum();
+        checkArray();
         System.arraycopy(array, index, array, index + 1, array.length - index - 1);
         array[position++] = item;
         return item;
@@ -34,6 +37,7 @@ public class IntListImpl implements IntList {
     public Integer set(int index, Integer item) {
         checkNotNull(item);
         checkIndex(index);
+        checkArray();
         array[index] = item;
         return item;
     }
@@ -43,6 +47,7 @@ public class IntListImpl implements IntList {
         checkItemExists(item);
         checkNotNull(item);
         checkNum();
+        checkArray();
         int deletedIndex = indexOf(item);
         if ((position - 1) > deletedIndex) {
             System.arraycopy(array, deletedIndex + 1, array, deletedIndex, array.length - deletedIndex - 1);
@@ -67,7 +72,7 @@ public class IntListImpl implements IntList {
 
     @Override
     public boolean contains(Integer item) {
-        Integer[] arrayForBinarySearch = Arrays.copyOf(array, array.length);
+        Integer[] arrayForBinarySearch = copyOf(array, array.length);
         sort(arrayForBinarySearch);
         return binarySearch(arrayForBinarySearch, item);
     }
@@ -125,7 +130,17 @@ public class IntListImpl implements IntList {
 
     @Override
     public Integer[] toArray() {
-        return Arrays.copyOf(array, array.length);
+        return copyOf(array, array.length);
+    }
+
+    private void grow() {
+        array = copyOf(array, (int) (array.length * 1.5));
+    }
+
+    private void checkArray() {
+        if (position == array.length - 1) {
+            grow();
+        }
     }
 
     private void sort(Integer[] arr) {
@@ -161,7 +176,7 @@ public class IntListImpl implements IntList {
     }
 
     private Integer[] resize() {
-        return array = Arrays.copyOf(array, position * 2);
+        return array = copyOf(array, position * 2);
     }
 
     private void checkNotNull(Integer item) {
